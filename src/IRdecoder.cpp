@@ -9,7 +9,6 @@ void handleIRsensor(void)
 
 void IRDecoder::init(void)
 {
-  //SET UP FOR PIN 1
   pinMode(irPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(irPin), ::handleIRsensor, CHANGE);
 }
@@ -17,10 +16,6 @@ void IRDecoder::init(void)
 void IRDecoder::handleIRsensor(void)
 {
   uint32_t currUS = micros();
-
-  //THIS MUST AGREE WITH THE PIN IN THE init() FUNCTION.
-  //probably best to use Pololu's FastGPIO library -- need to keep this
-  //as short as possible
 
   if(!digitalRead(irPin)) // FALLING edge
   {
@@ -35,8 +30,6 @@ void IRDecoder::handleIRsensor(void)
     uint32_t delta = risingEdge - fallingEdge; //length of pulse, in us
     uint32_t codeLength = risingEdge - lastRisingEdge;
     lastRisingEdge = risingEdge;
-
-    // bits[index] = delta;
     
     if(delta > 8500 && delta < 9500) // received a start pulse
     {
@@ -75,17 +68,13 @@ void IRDecoder::handleIRsensor(void)
 
     else if(state == IR_ACTIVE)
     {
-      //bits[index] = codeLength;
-      
       if(codeLength < 1300 && codeLength > 900) //short = 0
       {
-  //      bits[index] = 0;
         index++;
       }
       
       else if(codeLength < 2500 && codeLength > 2000) //long = 1
       {
-  //      bits[index] = 1;
         currCode += ((uint32_t)1 << index);
         index++;
       }

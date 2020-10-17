@@ -42,8 +42,6 @@ private:
   volatile uint32_t risingEdge = 0;
 
   volatile uint32_t lastRisingEdge = 0; //used for tracking spacing between rising edges, i.e., bit value
-public:
-  //volatile uint16_t bits[32];  //I used this for debugging; obsolete
 
 public:
   IRDecoder(uint8_t pin) : irPin(pin) {}
@@ -61,12 +59,12 @@ public:
       return 0;
   }
 
-  int16_t getKeyCode(void) //returns the most recent key code; returns 0 on error (not sure if 0 can be a code or not!!!)
+  int16_t getKeyCode(void) //returns the most recent key code; returns -1 on error (not sure if 0 can be a code or not!!!)
   {
     if (state == IR_COMPLETE || state == IR_REPEAT)
     {
       state = IR_READY;
-      return (uint8_t)(currCode >> 16); //ih, det er grimt
+      return (currCode >> 16) | 0x0ff; 
     }
     else
       return -1;
