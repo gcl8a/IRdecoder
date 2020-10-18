@@ -16,6 +16,15 @@
  * mapped on a remote by remote basis.
  */
 
+/*
+ * TO DO:
+ * - (MED) Possibly indicate repeat code instead of just "refreshing" the latest code?
+ * - (LOW) Consider a better way to indicate that a valid code has been entered;
+ *   returning -1 is OK if we return a 16-bit number (so 255 is a valid code),
+ *   but there may be a more elegant solution.
+ * - (MED) Add ability to use PCINT library to this generic library. Use a derived class?
+ */
+
 class IRDecoder
 {
 private:
