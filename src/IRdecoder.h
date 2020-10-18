@@ -64,7 +64,7 @@ public:
     if (state == IR_COMPLETE || state == IR_REPEAT)
     {
       state = IR_READY;
-      return (currCode >> 16) | 0x0ff; 
+      return (currCode >> 16) & 0x0ff; 
     }
     else
       return -1;
