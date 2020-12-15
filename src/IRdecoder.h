@@ -80,4 +80,9 @@ public:
   }
 };
 
+class IRDecoder32U4 : public IRDecoder
+{
+  IRDecoder32U4(uint8_t pin) : IRDecoder(pin) {}
+};
+
 extern IRDecoder decoder;
