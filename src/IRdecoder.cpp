@@ -41,13 +41,12 @@ void IRDecoder::handleIRsensor(void)
     //a pulse is supposed to be 562.5 us, but I found that it averaged 620us or so
     //with the sensor that we're using, which is NOT optimized for IR remotes --
     //it's actually optimized for sensitivity. So I set the maximum accepted pulse
-    //length to 700us
+    //length to 700us. On the ESP32 (others?), the pulse is sometimes coming in at 51n us,
+    //so lowering the bottom to 500.
 
-    else if(delta < 520 || delta > 700) // pulse wasn't right length => error
+    else if(delta < 500 || delta > 700) // pulse wasn't right length => error
     {
       state = IR_ERROR;
-      currCode = -1;
-
       return;
     }
 
@@ -62,7 +61,8 @@ void IRDecoder::handleIRsensor(void)
       else if(codeLength < 3300 && codeLength > 2800) //repeat code
       {
         state = IR_REPEAT;
-        lastReceiveTime = millis(); //not really used
+        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} //but recheck code!
+        else lastReceiveTime = millis(); //not really used
       }
     }
 
@@ -86,8 +86,8 @@ void IRDecoder::handleIRsensor(void)
 
       if(index == 32) //full set of bits
       {
-        //first, check for errors
-        if(((currCode ^ (currCode >> 8)) & 0x00ff00ff) != 0x00ff00ff) state = IR_ERROR;
+        //first, check for errors (kinda' ugly, but it works)
+        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;}
 
         else //we're good to go
         {        

@@ -75,6 +75,7 @@ public:
       state = IR_READY;
       return (currCode >> 16) & 0x0ff; 
     }
+    //else if(state == IR_ERROR) return currCode; //for debugging, if needed
     else
       return -1;
   }
