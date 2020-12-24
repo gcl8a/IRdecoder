@@ -38,11 +38,12 @@ void IRDecoder::handleIRsensor(void)
       return;
     }
     
-    //a pulse is supposed to be 562.5 us, but I found that it averaged 620us or so
-    //with the sensor that we're using, which is NOT optimized for IR remotes --
-    //it's actually optimized for sensitivity. So I set the maximum accepted pulse
-    //length to 700us. On the ESP32 (others?), the pulse is sometimes coming in at 51n us,
-    //so lowering the bottom to 500.
+   /* a pulse is supposed to be 562.5 us, but it varies based on the RC device, plus
+    * the receiver is NOT optimized for IR remotes --
+    * it's actually optimized for sensitivity. So I set the maximum accepted pulse
+    * length to 700us. On the ESP32 (others?), the pulse is sometimes coming in at ~515 us,
+    * so lowering the bottom to 500.
+    */
 
     else if(delta < 500 || delta > 700) // pulse wasn't right length => error
     {
@@ -52,13 +53,15 @@ void IRDecoder::handleIRsensor(void)
 
     else if(state == IR_PREAMBLE)
     {
+      //preamble is 4.5 ms, but we have to add the ~560 us burst to it
       if(codeLength < 5300 && codeLength > 4800) //preamble
       {
         currCode = 0;
         state = IR_ACTIVE;
       }
 
-      else if(codeLength < 3300 && codeLength > 2800) //repeat code
+      //repeat code is a 2.25 ms space + 560 us burst
+      else if(codeLength < 3300 && codeLength > 2700) //repeat code
       {
         state = IR_REPEAT;
         if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} //but recheck code!
@@ -68,11 +71,13 @@ void IRDecoder::handleIRsensor(void)
 
     else if(state == IR_ACTIVE)
     {
+      //short burst is nominally 1.125 ms
       if(codeLength < 1300 && codeLength > 900) //short = 0
       {
         index++;
       }
       
+      //long burst is nominally 2.25 ms
       else if(codeLength < 2500 && codeLength > 2000) //long = 1
       {
         currCode += ((uint32_t)1 << index);
