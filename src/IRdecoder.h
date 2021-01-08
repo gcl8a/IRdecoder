@@ -68,9 +68,9 @@ public:
       return 0;
   }
 
-  int16_t getKeyCode(void) //returns the most recent key code; returns -1 on error (not sure if 0 can be a code or not!!!)
+  int16_t getKeyCode(bool acceptRepeat = false) //returns the most recent key code; returns -1 on error (not sure if 0 can be a code or not!!!)
   {
-    if (state == IR_COMPLETE || state == IR_REPEAT)
+    if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
     {
       state = IR_READY;
       return (currCode >> 16) & 0x0ff; 
