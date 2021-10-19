@@ -4,7 +4,7 @@
 
 void handleIRsensor(void)
 {
-  decoder.handleIRsensor();
+  irDecoder.handleIRsensor();
 }
 
 void IRDecoder::init(void)
