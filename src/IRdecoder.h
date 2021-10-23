@@ -53,8 +53,8 @@ private:
   volatile uint32_t lastRisingEdge = 0; //used for tracking spacing between rising edges, i.e., bit value
 
 public:
-  IRDecoder(uint8_t pin) : irPin(pin) {}
-  void init(void);           //call this in the setup()
+  IRDecoder(void) : irPin(-1) {}
+  void init(uint8_t pin);           //call this in the setup()
   void handleIRsensor(void); //ISR
 
   uint32_t getCode(void) //returns the most recent valid code; returns zero if there was an error or nothing new

@@ -2,13 +2,16 @@
 
 /* Interprets an IR remote with NEC encoding. See IRdecoder.h for more explanation. */
 
+IRDecoder irDecoder;
+
 void handleIRsensor(void)
 {
   irDecoder.handleIRsensor();
 }
 
-void IRDecoder::init(void)
+void IRDecoder::init(uint8_t pin)
 {
+  irPin = pin;
   pinMode(irPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(irPin), ::handleIRsensor, CHANGE);
 }
