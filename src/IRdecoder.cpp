@@ -1,26 +1,66 @@
 #include <IRdecoder.h>
+#include <PCint.h>
 
-/* Interprets an IR remote with NEC encoding. See IRdecoder.h for more explanation. */
-
-IRDecoder irDecoder;
-
+/* ISR */
 void handleIRsensor(void)
 {
-  irDecoder.handleIRsensor();
+  decoder.handleIRsensor();
 }
 
-void IRDecoder::init(uint8_t pin)
+/**
+ * Initializes the decoder for a specific pin.
+ * 
+ * @param p The pin to use for decoding. Can be any external or pin change interrupt.
+ * */
+void IRDecoder::init(void)
 {
-  irPin = pin;
-  pinMode(irPin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(irPin), ::handleIRsensor, CHANGE);
+  pinMode(pin, INPUT);
+
+  if(digitalPinToInterrupt(pin) != NOT_AN_INTERRUPT)
+  {
+    Serial.println(F("Attaching ISR"));
+    attachInterrupt(digitalPinToInterrupt(pin), ::handleIRsensor, CHANGE);
+  }
+  else if(digitalPinToPCInterrupt(pin) != NOT_AN_INTERRUPT)
+  {
+    Serial.print(F("Attaching PC_ISR to PCINT"));
+    Serial.println(digitalPinToPCInterrupt(pin));
+    attachPCInt(digitalPinToPCInterrupt(pin), ::handleIRsensor);
+  }
+  else
+  {
+    Serial.println(F("Not an interrupt pin!"));
+  }
 }
 
+/**
+ * Returns the most recent key code; returns -1 on error (can't use 0, since many remotes send 0 for a button.)
+ * */
+int16_t IRDecoder::getKeyCode(bool acceptRepeat) 
+{
+  // if(pin == -1) 
+  // {
+  //   Serial.println("IR receiver not initialized.");
+  //   return -1;
+  // }
+
+  if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
+  {
+    state = IR_READY;
+    return (currCode >> 16) & 0x0ff;
+  }
+  else
+    return -1;
+}
+
+/**
+ * Called from the ISR to interpret codes.
+ * */
 void IRDecoder::handleIRsensor(void)
 {
   uint32_t currUS = micros();
 
-  if(!digitalRead(irPin)) // FALLING edge
+  if(!digitalRead(pin)) // FALLING edge
   {
     fallingEdge = currUS; 
   }
@@ -33,6 +73,8 @@ void IRDecoder::handleIRsensor(void)
     uint32_t delta = risingEdge - fallingEdge; //length of pulse, in us
     uint32_t codeLength = risingEdge - lastRisingEdge;
     lastRisingEdge = risingEdge;
+
+    // bits[index] = delta; //used for debugging; obsolete
     
     if(delta > 8500 && delta < 9500) // received a start pulse
     {
@@ -41,46 +83,42 @@ void IRDecoder::handleIRsensor(void)
       return;
     }
     
-   /* a pulse is supposed to be 562.5 us, but it varies based on the RC device, plus
-    * the receiver is NOT optimized for IR remotes --
-    * it's actually optimized for sensitivity. So I set the maximum accepted pulse
-    * length to 700us. On the ESP32 (others?), the pulse is sometimes coming in at ~515 us,
-    * so lowering the bottom to 500.
-    */
+    //a pulse is supposed to be 562.5 us, but I found that it averaged 620us or so
+    //with the sensor that we're using, which is NOT optimized for IR remotes --
+    //it's actually optimized for sensitivity. So I set the maximum accepted pulse
+    //length to 700us
 
-    else if(delta < 500 || delta > 700) // pulse wasn't right length => error
+    else if(delta < 500 || delta > 700) // if the pulse isn't the right width -> set error
     {
       state = IR_ERROR;
+      currCode = -1;
+
       return;
     }
 
     else if(state == IR_PREAMBLE)
     {
-      //preamble is 4.5 ms, but we have to add the ~560 us burst to it
       if(codeLength < 5300 && codeLength > 4800) //preamble
       {
         currCode = 0;
         state = IR_ACTIVE;
       }
 
-      //repeat code is a 2.25 ms space + 560 us burst
       else if(codeLength < 3300 && codeLength > 2700) //repeat code
       {
         state = IR_REPEAT;
-        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} //but recheck code!
-        else lastReceiveTime = millis(); //not really used
+        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} 
+        lastReceiveTime = millis(); //not really used
       }
     }
 
     else if(state == IR_ACTIVE)
     {
-      //short burst is nominally 1.125 ms
       if(codeLength < 1300 && codeLength > 900) //short = 0
       {
         index++;
       }
       
-      //long burst is nominally 2.25 ms
       else if(codeLength < 2500 && codeLength > 2000) //long = 1
       {
         currCode += ((uint32_t)1 << index);
@@ -94,13 +132,13 @@ void IRDecoder::handleIRsensor(void)
 
       if(index == 32) //full set of bits
       {
-        //first, check for errors (kinda' ugly, but it works)
-        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;}
+        //first, check for errors
+        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) state = IR_ERROR;
 
-        else //we're good to go
+        else //no errors, so we're good to go
         {        
           state = IR_COMPLETE;
-          lastReceiveTime = millis();
+          lastReceiveTime = millis(); //not actually used
         }
       }
     }

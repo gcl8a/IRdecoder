@@ -1,33 +1,34 @@
+#pragma once 
+
 #include <Arduino.h>
 
-/*
- * A class to interpret IR remotes with NEC encoding. NEC encoding sends four bytes:
+/** \class IRDecoder
+ * A class to interpret IR remotes with NEC encoding.
  * 
- * [device ID, ~divice ID, key code, ~key code]
+ * IRdecoder decoder is declared as an extern. The user only need call init(pin) in setup().
+ * 
+ * NEC encoding sends four bytes, [device ID, ~device ID, key code, ~key code], using pulse distance coding.
  * 
  * Sending the inverse allow for easy error checking (and reduces saturation in the receiver).
  * 
- * Codes are send in little endian; this library reverses upon reception, so the first bit received
- * is in the LSB of currCode. That means that the key code is found in bits [23..16] of currCode
+ * Codes are sent little endian; this library reverses upon reception, so the first bit received
+ * is in the LSB of currCode. That means that the key code is found in currCode[23..16] and the
+ * device ID in currCode[7..0].
  * 
+ * This library currently ignores the device ID and does not check it against ~device ID for errors.
+ * 
+ * For an overview of NEC coding, see: 
  * https://techdocs.altium.com/display/FPGA/NEC+Infrared+Transmission+Protocol
  * 
- * This does not interpret the codes into which key was pressed. That needs to be 
+ * This does not interpret the codes as a particular key press. That needs to be 
  * mapped on a remote by remote basis.
- */
-
-/*
- * TO DO:
- * - (MED) Possibly indicate repeat code instead of just "refreshing" the latest code?
- * - (LOW) Consider a better way to indicate that a valid code has been entered;
- *   returning -1 is OK if we return a 16-bit number (so 255 is a valid code),
- *   but there may be a more elegant solution.
- * - (MED) Add ability to use PCINT library to this generic library. Use a derived class?
  */
 
 class IRDecoder
 {
 private:
+  int8_t pin = -1;
+
   enum IR_STATE
   {
     IR_READY,    //idle, returns to this state after you request a code
@@ -35,14 +36,12 @@ private:
     IR_REPEAT,   //received repeat code (part of NEC protocol); last code will be returned
     IR_ACTIVE,   //have some bits, but not yet complete
     IR_COMPLETE, //a valid code has been received
-    IR_ERROR
-  }; //an error occurred; won't return a valid code
+    IR_ERROR     //an error occurred; won't return a valid code
+  }; 
 
-  uint8_t irPin;
+  volatile IR_STATE state = IR_READY; //a simple state machine for managing reception
 
-  IR_STATE state = IR_READY; //a simple state machine for managing reception
-
-  volatile uint32_t lastReceiveTime = 0; //not really used -- could be used to sunset codes
+  volatile uint32_t lastReceiveTime = 0; //not actually used -- could be used to sunset codes
 
   volatile uint32_t currCode = 0; //the most recently received valid code
   volatile uint8_t index = 0;     //for tracking which bit we're on
@@ -51,34 +50,15 @@ private:
   volatile uint32_t risingEdge = 0;
 
   volatile uint32_t lastRisingEdge = 0; //used for tracking spacing between rising edges, i.e., bit value
+public:
+  //volatile uint16_t bits[32];  //I used this for debugging; obsolete
 
 public:
-  IRDecoder(void) : irPin(-1) {}
-  void init(uint8_t pin);           //call this in the setup()
-  void handleIRsensor(void); //ISR
+  IRDecoder(const int8_t p) : pin(p) {}
+  void init(void);     // Must be called in setup()
+  void handleIRsensor(void);      // Called by the ISR
 
-  uint32_t getCode(void) //returns the most recent valid code; returns zero if there was an error or nothing new
-  {
-    if (state == IR_COMPLETE || state == IR_REPEAT)
-    {
-      state = IR_READY;
-      return currCode;
-    }
-    else
-      return 0;
-  }
-
-  int16_t getKeyCode(bool acceptRepeat = false) //returns the most recent key code; returns -1 on error (not sure if 0 can be a code or not!!!)
-  {
-    if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
-    {
-      state = IR_READY;
-      return (currCode >> 16) & 0x0ff; 
-    }
-    //else if(state == IR_ERROR) return currCode; //for debugging, if needed
-    else
-      return -1;
-  }
+  int16_t getKeyCode(bool acceptRepeat = false); 
 };
 
-extern IRDecoder irDecoder;
+extern IRDecoder decoder;
