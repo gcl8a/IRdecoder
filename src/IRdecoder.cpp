@@ -34,16 +34,11 @@ void IRDecoder::init(void)
 }
 
 /**
- * Returns the most recent key code; returns -1 on error (can't use 0, since many remotes send 0 for a button.)
+ * Returns the most recent key code; returns -1 on error 
+ * (can't use 0, since many remotes send 0 for a button.)
  * */
 int16_t IRDecoder::getKeyCode(bool acceptRepeat) 
 {
-  // if(pin == -1) 
-  // {
-  //   Serial.println("IR receiver not initialized.");
-  //   return -1;
-  // }
-
   if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
   {
     state = IR_READY;
