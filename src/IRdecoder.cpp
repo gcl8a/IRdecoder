@@ -59,6 +59,34 @@ int16_t IRDecoder::getKeyCode(bool acceptRepeat)
 }
 
 /**
+ * Returns the most recent key code; returns -1 on error 
+ * (can't use 0, since many remotes send 0 for a button.)
+ * */
+bool IRDecoder::get32BitCode(uint32_t& code) 
+{
+  if (state == IR_COMPLETE)
+  {
+    //check for errors by XOR'ing the first three bytes and then comparing to a checksum
+    uint8_t checksum = (currCode >> 16) ^ (currCode >> 8) ^ (currCode >> 0);
+
+    if(checkSum - (Uint8_t)(currCode >> 24))
+    {
+      state = IR_ERROR;
+      return false;
+    }
+
+    else //no errors, so we're good to go
+    {        
+      state = IR_READY;
+      code = currCode;
+      return true;
+    }
+  }
+  else
+    return false;
+}
+
+/**
  * Called from the ISR to interpret codes.
  * */
 void IRDecoder::handleIRsensor(void)
@@ -139,15 +167,6 @@ void IRDecoder::handleIRsensor(void)
       {
           state = IR_COMPLETE;
           lastReceiveTime = millis(); //not actually used
-
-        // //first, check for errors
-        // if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) state = IR_ERROR;
-
-        // else //no errors, so we're good to go
-        // {        
-        //   state = IR_COMPLETE;
-        //   lastReceiveTime = millis(); //not actually used
-        // }
       }
     }
   }

@@ -59,7 +59,7 @@ public:
   void handleIRsensor(void);      // Called by the ISR
 
   int16_t getKeyCode(bool acceptRepeat = false); 
-  uint32_t get32BitCode(void);
+  bool get32BitCode(uint32_t&);
 };
 
 extern IRDecoder decoder;
