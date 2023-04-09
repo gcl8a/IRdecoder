@@ -41,8 +41,18 @@ int16_t IRDecoder::getKeyCode(bool acceptRepeat)
 {
   if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
   {
-    state = IR_READY;
-    return (currCode >> 16) & 0x0ff;
+    //check for errors
+    if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) 
+    {
+      state = IR_ERROR;
+      return -1;
+    }
+
+    else //no errors, so we're good to go
+    {        
+      state = IR_READY;
+      return (currCode >> 16) & 0x0ff;
+    }
   }
   else
     return -1;
@@ -127,14 +137,17 @@ void IRDecoder::handleIRsensor(void)
 
       if(index == 32) //full set of bits
       {
-        //first, check for errors
-        if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) state = IR_ERROR;
-
-        else //no errors, so we're good to go
-        {        
           state = IR_COMPLETE;
           lastReceiveTime = millis(); //not actually used
-        }
+
+        // //first, check for errors
+        // if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) state = IR_ERROR;
+
+        // else //no errors, so we're good to go
+        // {        
+        //   state = IR_COMPLETE;
+        //   lastReceiveTime = millis(); //not actually used
+        // }
       }
     }
   }
