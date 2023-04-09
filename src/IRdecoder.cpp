@@ -67,9 +67,7 @@ bool IRDecoder::get32BitCode(uint32_t& code)
   if (state == IR_COMPLETE)
   {
     //check for errors by XOR'ing the first three bytes and then comparing to a checksum
-    uint8_t checksum = (currCode >> 16) ^ (currCode >> 8) ^ (currCode >> 0);
-
-    if(checksum - (uint8_t)(currCode >> 24))
+    if((uint8_t)(currCode >> 24) ^ (uint8_t)(currCode >> 16) ^ (uint8_t)(currCode >> 8) ^ (uint8_t)(currCode >> 0);
     {
       state = IR_ERROR;
       return false;
