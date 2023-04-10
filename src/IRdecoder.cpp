@@ -71,7 +71,7 @@ bool IRDecoder::get32BitCode(uint32_t& code)
     state = IR_READY;
     code = currCode;
     return true;
-    
+  }
   else
     return false;
 }
