@@ -35,7 +35,7 @@ void IRDecoder::init(void)
 
 /**
  * Returns the most recent key code; returns -1 on error 
- * (can't use 0, since many remotes send 0 for a button.)
+ * (can't use 0, since many remotes send 0 for a button, which annoys me.)
  * */
 int16_t IRDecoder::getKeyCode(bool acceptRepeat) 
 {
@@ -59,8 +59,11 @@ int16_t IRDecoder::getKeyCode(bool acceptRepeat)
 }
 
 /**
- * Returns the most recent key code; returns -1 on error 
- * (can't use 0, since many remotes send 0 for a button.)
+ * Fetches the most recent key code; 
+ * 
+ * Returns true if a new code is available and fills code.
+ * 
+ * Returns false otherwise.
  * */
 bool IRDecoder::get32BitCode(uint32_t& code) 
 {

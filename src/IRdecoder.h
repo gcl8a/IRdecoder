@@ -33,6 +33,9 @@
  * 
  * This does not interpret the codes as a particular key press. That needs to be 
  * mapped on a remote by remote basis. See, for example, ir_codes.h
+ * 
+ * Note that the code only returns a code once it has received one. If you call a check function
+ * twice in rapid succession, the second call will return -1, since no new code is available.
  */
 
 class IRDecoder
