@@ -7,21 +7,32 @@
  * 
  * IRdecoder decoder is declared as an extern. The user only need call init(pin) in setup().
  * 
- * NEC encoding sends four bytes, [device ID, ~device ID, key code, ~key code], using pulse distance coding.
+ * NEC encoding sends four bytes in little endian:
+ *  device ID
+ *  ~device ID
+ *  key code
+ *  ~key code
+ * 
+ * using pulse distance coding, but note that many remotes (inkl. the one from Pololu)
+ * use a 16-bit device code, so only the key code is inversed.
  * 
  * Sending the inverse allow for easy error checking (and reduces saturation in the receiver).
  * 
- * Codes are sent little endian; this library reverses upon reception, so the first bit received
- * is in the LSB of currCode. That means that the key code is found in currCode[23..16] and the
- * device ID in currCode[7..0].
+ * Codes are sent little endian; this library fills uint32 currCode from the LSB upon reception, 
+ * That means that the key code is found in currCode[23..16] and the device ID in currCode[7..0].
  * 
- * This library currently ignores the device ID and does not check it against ~device ID for errors.
+ * This library currently ignores the device ID and does not check it against ~device ID for errors
+ * since many remotes don't follow that particular protocol.
  * 
  * For an overview of NEC coding, see: 
  * https://techdocs.altium.com/display/FPGA/NEC+Infrared+Transmission+Protocol
  * 
+ * The user can choose whether or not to ignore repeat signals.
+ * 
+ * The user can also just fetch the 32-bit code and do whatever they want with it.
+ * 
  * This does not interpret the codes as a particular key press. That needs to be 
- * mapped on a remote by remote basis.
+ * mapped on a remote by remote basis. See, for example, ir_codes.h
  */
 
 class IRDecoder

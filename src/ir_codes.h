@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * IR remote mapping for the IR remote from Pololu
+ * which is really from Adafruit, but I don't like Adafruit
+ * 
+ * https://www.pololu.com/product/2777
+*/
+
 #define VOLminus    0
 #define PLAY_PAUSE  1
 #define VOLplus     2
