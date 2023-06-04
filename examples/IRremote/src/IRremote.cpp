@@ -1,7 +1,7 @@
 /**
  * Example code for how to use the IR decoder library.
  * 
- * Note that decoder is declared in the library, so don't declare it here.
+ * Note that decoder is declared in the library, so we don't declare it here.
 */
 
 #include <IRdecoder.h>

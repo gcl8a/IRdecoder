@@ -1,6 +1,7 @@
 #include <IRdecoder.h>
 #include <PCint.h>
 
+// Instantiate the decoder here.
 IRDecoder decoder;
 
 /* ISR */
