@@ -5,7 +5,8 @@
 /** \class IRDecoder
  * A class to interpret IR remotes with NEC encoding.
  * 
- * IRdecoder decoder is declared as an extern. The user only need call init(pin) in setup().
+ * IRdecoder decoder is declared as an extern and instantiated in the .cpp library file. 
+ * The user only need call init(pin) in setup().
  * 
  * NEC encoding sends four bytes in little endian:
  *  device ID
@@ -34,8 +35,8 @@
  * This does not interpret the codes as a particular key press. That needs to be 
  * mapped on a remote by remote basis. See, for example, ir_codes.h
  * 
- * Note that the code only returns a code once it has received one. If you call a check function
- * twice in rapid succession, the second call will return -1, since no new code is available.
+ * Note that the code only returns true once it has received a code. If you call a check function
+ * twice in rapid succession, the second call will return false, since no new code is available.
  */
 
 class IRDecoder
@@ -55,8 +56,6 @@ private:
 
   volatile IR_STATE state = IR_READY; //a simple state machine for managing reception
 
-  // volatile uint32_t lastReceiveTime = 0; //not actually used -- could be used to sunset codes
-
   volatile uint32_t currCode = 0; //the most recently received valid code
   volatile uint8_t index = 0;     //for tracking which bit we're on
 
@@ -73,7 +72,7 @@ public:
 
 public:
   IRDecoder(void) {}
-  bool init(const uint8_t p);      // Must be called in setup()
+  bool init(const uint8_t p);     // Must be called in setup()
   void handleIRsensor(void);      // Called by the ISR
 
   bool getKeyCode(uint8_t& keyCode, bool acceptRepeat = false); 

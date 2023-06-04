@@ -126,7 +126,6 @@ void IRDecoder::handleIRsensor(void)
     //with the sensor that we're using, which is NOT optimized for IR remotes --
     //it's actually optimized for sensitivity. So I set the maximum accepted burst
     //length to 700us
-
     else if(delta < 500 || delta > 700) // if the burst isn't the right width -> set error
     {
       state = IR_ERROR;
@@ -146,8 +145,6 @@ void IRDecoder::handleIRsensor(void)
       else if(codeLength < 3300 && codeLength > 2700) //repeat code
       {
         state = IR_REPEAT;
-        // if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} 
-        // lastReceiveTime = millis(); //not really used
       }
     }
 
@@ -172,7 +169,6 @@ void IRDecoder::handleIRsensor(void)
       if(index == 32) //full set of bits
       {
           state = IR_COMPLETE;
-          // lastReceiveTime = millis(); //not actually used
       }
     }
   }
