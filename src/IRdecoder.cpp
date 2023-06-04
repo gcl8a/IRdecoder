@@ -65,9 +65,9 @@ int16_t IRDecoder::getKeyCode(bool acceptRepeat)
  * 
  * Returns false otherwise.
  * */
-bool IRDecoder::get32BitCode(uint32_t& code) 
+bool IRDecoder::get32BitCode(uint32_t& code, bool acceptRepeat) 
 {
-  if (state == IR_COMPLETE)
+  if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
   {
     // note that we're not checking for errors, but just returning the raw code.
     state = IR_READY;
