@@ -64,8 +64,11 @@ private:
   volatile uint32_t risingEdge = 0;
 
   volatile uint32_t lastRisingEdge = 0; //used for tracking spacing between rising edges, i.e., bit value
+
 public:
-  //volatile uint16_t bits[32];  //I used this for debugging; obsolete
+#ifdef __DEBUG_IR__
+  volatile uint16_t bits[32];  //I used this for debugging; obsolete
+#endif
 
 public:
   IRDecoder(void) {}

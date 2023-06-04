@@ -71,7 +71,7 @@ bool IRDecoder::getKeyCode(uint8_t& keyCode, bool acceptRepeat)
 }
 
 /**
- * Checks if a new code is available.
+ * Checks if a new 32-bit code is available.
  * 
  * Returns true if a new code is available and fills code.
  * 
@@ -111,8 +111,10 @@ void IRDecoder::handleIRsensor(void)
     uint32_t codeLength = risingEdge - lastRisingEdge;
     lastRisingEdge = risingEdge;
 
-    // bits[index] = delta; // was used for debugging; obsolete
-    
+#ifdef __DEBUG_IR__
+    bits[index] = delta; // was used for debugging; obsolete
+#endif    
+
     if(delta > 8500 && delta < 9500) // received a start pulse
     {
       index = 0;
