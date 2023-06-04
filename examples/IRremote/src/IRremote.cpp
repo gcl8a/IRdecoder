@@ -9,11 +9,18 @@
 void setup(void)
 {
     Serial.begin(115200);
-    if(!decoder.init(0)) Serial.println("Error in IRDecoder::init().");
+    if(!decoder.init(17)) 
+    {
+        while(1)
+        {
+            Serial.println("Error in IRDecoder::init().");
+            delay(500);
+        }
+    }
 }
 
 void loop(void)
 {
     uint8_t keyCode = 0;
-    if(decoder.getKeyCode(keyCode)) Serial.println(keyCode);
+    if(decoder.getKeyCode(keyCode, true)) Serial.println(keyCode);
 }
