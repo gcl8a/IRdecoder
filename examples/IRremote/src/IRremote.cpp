@@ -1,9 +1,10 @@
 #include <IRdecoder.h>
 
-IRDecoder decoder (0);
+IRDecoder decoder(0);
 
 void setup(void)
 {
+    Serial.begin(115200);
     decoder.init();
 }
 
