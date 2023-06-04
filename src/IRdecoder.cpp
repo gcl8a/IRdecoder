@@ -110,12 +110,12 @@ void IRDecoder::handleIRsensor(void)
       return;
     }
     
-    //a pulse is supposed to be 562.5 us, but I found that it averaged 620us or so
+    //a burst is supposed to be 562.5 us, but I found that it averaged 620us or so
     //with the sensor that we're using, which is NOT optimized for IR remotes --
-    //it's actually optimized for sensitivity. So I set the maximum accepted pulse
+    //it's actually optimized for sensitivity. So I set the maximum accepted burst
     //length to 700us
 
-    else if(delta < 500 || delta > 700) // if the pulse isn't the right width -> set error
+    else if(delta < 500 || delta > 700) // if the burst isn't the right width -> set error
     {
       state = IR_ERROR;
       currCode = -1;
