@@ -9,7 +9,7 @@
 void setup(void)
 {
     Serial.begin(115200);
-    if(!decoder.init(17)) 
+    if(!decoder.init(IR_PIN)) 
     {
         while(1)
         {
