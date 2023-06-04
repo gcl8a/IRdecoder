@@ -1,11 +1,11 @@
 #include <IRdecoder.h>
 
-IRDecoder decoder(0);
+IRDecoder decoder;
 
 void setup(void)
 {
     Serial.begin(115200);
-    decoder.init();
+    decoder.init(0);
 }
 
 void loop(void)

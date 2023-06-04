@@ -12,25 +12,33 @@ void handleIRsensor(void)
  * 
  * @param p The pin to use for decoding. Can be any external or pin change interrupt.
  * */
-void IRDecoder::init(void)
+bool IRDecoder::init(const uint8_t p)
 {
+  bool retVal = false;
+  pin = p;
   pinMode(pin, INPUT);
 
   if(digitalPinToInterrupt(pin) != NOT_AN_INTERRUPT)
   {
     Serial.println(F("Attaching ISR"));
     attachInterrupt(digitalPinToInterrupt(pin), ::handleIRsensor, CHANGE);
+    retVal = true;
   }
+
   else if(digitalPinToPCInterrupt(pin) != NOT_AN_INTERRUPT)
   {
     Serial.print(F("Attaching PC_ISR to PCINT"));
     Serial.println(digitalPinToPCInterrupt(pin));
     attachPCInt(digitalPinToPCInterrupt(pin), ::handleIRsensor);
+    retVal = true;
   }
+
   else
   {
     Serial.println(F("Not an interrupt pin!"));
   }
+
+  return retVal;
 }
 
 /**

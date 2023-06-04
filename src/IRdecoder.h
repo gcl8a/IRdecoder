@@ -68,8 +68,8 @@ public:
   //volatile uint16_t bits[32];  //I used this for debugging; obsolete
 
 public:
-  IRDecoder(const int8_t p) : pin(p) {}
-  void init(void);     // Must be called in setup()
+  IRDecoder(void) {}
+  bool init(const uint8_t p);      // Must be called in setup()
   void handleIRsensor(void);      // Called by the ISR
 
   int16_t getKeyCode(bool acceptRepeat = false); 
