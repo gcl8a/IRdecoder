@@ -22,5 +22,11 @@ void setup(void)
 void loop(void)
 {
     uint8_t keyCode = 0;
-    if(decoder.getKeyCode(keyCode, true)) Serial.println(keyCode);
+    if(decoder.getKeyCode(keyCode)) // add true to accept repeats
+    {
+        Serial.print(millis());
+        Serial.print('\t');
+        Serial.print(keyCode);
+        Serial.print('\n');
+    }
 }
