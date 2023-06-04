@@ -63,7 +63,8 @@ private:
   volatile uint32_t fallingEdge = 0;
   volatile uint32_t risingEdge = 0;
 
-  volatile uint32_t lastRisingEdge = 0; //used for tracking spacing between rising edges, i.e., bit value
+  //used for tracking spacing between rising edges, i.e., bit value
+  volatile uint32_t lastRisingEdge = 0;
 
 public:
 #ifdef __DEBUG_IR__
