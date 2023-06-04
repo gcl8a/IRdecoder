@@ -59,7 +59,7 @@ int16_t IRDecoder::getKeyCode(bool acceptRepeat)
 }
 
 /**
- * Fetches the most recent key code; 
+ * Checks if a new code is available.
  * 
  * Returns true if a new code is available and fills code.
  * 
@@ -69,8 +69,7 @@ bool IRDecoder::get32BitCode(uint32_t& code)
 {
   if (state == IR_COMPLETE)
   {
-    // note that we're not checking for errors, but that's because some remotes don't follow strict NEC code
-    
+    // note that we're not checking for errors, but just returning the raw code.
     state = IR_READY;
     code = currCode;
     return true;
@@ -95,12 +94,12 @@ void IRDecoder::handleIRsensor(void)
   {
     risingEdge = currUS;
 
-    //and process
+    // and process
     uint32_t delta = risingEdge - fallingEdge; //length of pulse, in us
     uint32_t codeLength = risingEdge - lastRisingEdge;
     lastRisingEdge = risingEdge;
 
-    // bits[index] = delta; //used for debugging; obsolete
+    // bits[index] = delta; // was used for debugging; obsolete
     
     if(delta > 8500 && delta < 9500) // received a start pulse
     {
