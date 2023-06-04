@@ -14,6 +14,6 @@ void setup(void)
 
 void loop(void)
 {
-    int16_t keyCode = decoder.getKeyCode();
-    if(keyCode != -1) Serial.println(keyCode);
+    uint8_t keyCode = 0;
+    if(decoder.getKeyCode(keyCode)) Serial.println(keyCode);
 }

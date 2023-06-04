@@ -72,7 +72,7 @@ public:
   bool init(const uint8_t p);      // Must be called in setup()
   void handleIRsensor(void);      // Called by the ISR
 
-  int16_t getKeyCode(bool acceptRepeat = false); 
+  bool getKeyCode(uint8_t& keyCode, bool acceptRepeat = false); 
   bool get32BitCode(uint32_t& code, bool acceptRepeat = false);
 };
 

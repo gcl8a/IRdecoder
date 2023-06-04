@@ -45,30 +45,29 @@ bool IRDecoder::init(const uint8_t p)
 }
 
 /**
- * Returns the most recent key code; returns -1 on error 
- * (can't use 0, since many remotes send 0 for a button, which annoys me.)
- * 
- * Theoretically, a remote could return 0 or 255, so we return an int16 so that -1 is an option.
+ * We pass the keyCode by reference and return true if there is a new key code available.
  * */
-int16_t IRDecoder::getKeyCode(bool acceptRepeat) 
+bool IRDecoder::getKeyCode(uint8_t& keyCode, bool acceptRepeat) 
 {
+  bool retVal = false;
+
   if (state == IR_COMPLETE || (acceptRepeat == true && state == IR_REPEAT))
   {
     //check for errors
     if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) 
     {
       state = IR_ERROR;
-      return -1;
     }
 
     else //no errors, so we're good to go
     {        
       state = IR_READY;
-      return (currCode >> 16) & 0x0ff;
+      keyCode = (currCode >> 16) & 0x0ff;
+      retVal = true;
     }
   }
-  else
-    return -1;
+  
+  return retVal;
 }
 
 /**
