@@ -55,7 +55,7 @@ private:
 
   volatile IR_STATE state = IR_READY; //a simple state machine for managing reception
 
-  volatile uint32_t lastReceiveTime = 0; //not actually used -- could be used to sunset codes
+  // volatile uint32_t lastReceiveTime = 0; //not actually used -- could be used to sunset codes
 
   volatile uint32_t currCode = 0; //the most recently received valid code
   volatile uint8_t index = 0;     //for tracking which bit we're on

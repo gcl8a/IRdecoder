@@ -133,7 +133,7 @@ void IRDecoder::handleIRsensor(void)
       {
         state = IR_REPEAT;
         if(((currCode ^ (currCode >> 8)) & 0x00ff0000) != 0x00ff0000) {state = IR_ERROR;} 
-        lastReceiveTime = millis(); //not really used
+        // lastReceiveTime = millis(); //not really used
       }
     }
 
@@ -158,7 +158,7 @@ void IRDecoder::handleIRsensor(void)
       if(index == 32) //full set of bits
       {
           state = IR_COMPLETE;
-          lastReceiveTime = millis(); //not actually used
+          // lastReceiveTime = millis(); //not actually used
       }
     }
   }
