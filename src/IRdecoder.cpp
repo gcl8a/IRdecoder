@@ -1,6 +1,8 @@
 #include <IRdecoder.h>
 #include <PCint.h>
 
+IRDecoder decoder;
+
 /* ISR */
 void handleIRsensor(void)
 {

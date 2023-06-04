@@ -1,11 +1,15 @@
-#include <IRdecoder.h>
+/**
+ * Example code for how to use the IR decoder library.
+ * 
+ * Note that decoder is declared in the library, so don't declare it here.
+*/
 
-IRDecoder decoder;
+#include <IRdecoder.h>
 
 void setup(void)
 {
     Serial.begin(115200);
-    decoder.init(0);
+    if(!decoder.init(0)) Serial.println("Error in IRDecoder::init().");
 }
 
 void loop(void)
