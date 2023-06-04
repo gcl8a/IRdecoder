@@ -28,6 +28,9 @@
  * For an overview of NEC coding, see: 
  * https://techdocs.altium.com/display/FPGA/NEC+Infrared+Transmission+Protocol
  * 
+ * For overview of IR technology, see:
+ * https://www.vishay.com/docs/80071/dataform.pdf
+ * 
  * The user can choose whether or not to ignore repeat signals.
  * 
  * The user can also just fetch the 32-bit code and do whatever they want with it.
